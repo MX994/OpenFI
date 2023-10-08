@@ -54,6 +54,9 @@ class DualSense:
     def get_l1_pressed(self):
         return self.frame.special & Special.L1.value
     
+    def get_r1_pressed(self):
+        return self.frame.special & Special.R1.value
+    
     def get_l2_pressed(self):
         return self.frame.special & Special.L2.value
     

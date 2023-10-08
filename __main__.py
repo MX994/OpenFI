@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 from widgets.core_devices import *
 from core_devices.dualsense import DualSense
 from handlers.controller import *
+from handlers.movement import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -27,6 +28,8 @@ class MainWindow(QMainWindow):
             Define components to be placed in the view.
         '''
         CoreIODevices.XY.connect('/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0')
+        self.controller_worker = ControllerWorker()
+        self.movement_worker = MovementWorker()
         # Toolbar
         toolbar = QToolBar("Main Toolbar")
         toolbar.setIconSize(QSize(16, 16))
@@ -72,28 +75,11 @@ class MainWindow(QMainWindow):
         # Add subwindows.
         self.setCentralWidget(CoreDevicesWidget())
         self.setStatusBar(QStatusBar(self))
-
-        self.controller_worker = ControllerWorker()
+        
+        self.controller_worker.doAutoHome.connect(self.movement_worker.do_auto_home)
+        self.controller_worker.doRelativeMove.connect(self.movement_worker.do_move_relative)
+        self.movement_worker.movementFinished.connect(self.controller_worker.enable_input)
         self.controller_worker.start()
-
-    def keyPressEvent(self, event: QKeyEvent | None) -> None:
-        delta_position = [0, 0, 0]
-        match event.key():
-            case Qt.Key.Key_W:
-                delta_position[1] = 0.5
-            case Qt.Key.Key_S:
-                delta_position[1] = -0.5
-            case Qt.Key.Key_A:
-                delta_position[0] = -0.5
-            case Qt.Key.Key_D:
-                delta_position[0] = 0.5
-            case Qt.Key.Key_Q:
-                delta_position[2] = -0.25
-            case Qt.Key.Key_E:
-                delta_position[2] = 0.25
-        CoreIODevices.XY.set_position_mode(PositionMode.Relative)
-        CoreIODevices.XY.move(delta_position)
-        return super().keyPressEvent(event)
     
     def onRunGlitchClicked(self, s):
         print("click", s)
