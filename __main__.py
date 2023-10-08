@@ -15,17 +15,18 @@ from PyQt6.QtWidgets import (
     QGridLayout
 )
 from widgets.core_devices import *
+from core_devices.dualsense import DualSense
+from handlers.controller import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle("OpenEMP")
 
-        layout = QGridLayout()
         '''
             Define components to be placed in the view.
         '''
-
+        CoreIODevices.XY.connect('/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0')
         # Toolbar
         toolbar = QToolBar("Main Toolbar")
         toolbar.setIconSize(QSize(16, 16))
@@ -50,6 +51,9 @@ class MainWindow(QMainWindow):
         '''
             Construct final layout.
         '''
+
+        layout = QGridLayout()
+        
         # Add glitch controller buttons.
         toolbar.addActions([
             self.run_glitch_action,
@@ -62,9 +66,15 @@ class MainWindow(QMainWindow):
         toolbar.addWidget(self.harness_list)
         toolbar.addSeparator()
 
+        CoreIODevices.XY.set_stepper_steps(X=200, Y=200, Z=800)
+        CoreIODevices.XY.set_message('OpenEMP loaded.')
+
         # Add subwindows.
         self.setCentralWidget(CoreDevicesWidget())
         self.setStatusBar(QStatusBar(self))
+
+        self.controller_worker = ControllerWorker()
+        self.controller_worker.start()
 
     def keyPressEvent(self, event: QKeyEvent | None) -> None:
         delta_position = [0, 0, 0]

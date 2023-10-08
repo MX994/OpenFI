@@ -37,6 +37,12 @@ class XYPlane:
     def get_projected_position(self):
         ...
 
+    def set_stepper_steps(self, X=None, Y=None, Z=None, E=None):
+        self.send_command(f'M092 {f"X{X}" if X != None else ""} {f"Y{Y}" if Y != None else ""} {f"Z{Z}" if Z != None else ""}')
+
+    def set_message(self, msg):
+        self.send_command(f'M117 {msg}')
+
     def get_position_mode(self) -> PositionMode:
         return self.position_mode
     
