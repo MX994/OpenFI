@@ -39,8 +39,12 @@ class GlitchParametersWidget(QWidget):
             Construct final layout.
         '''
         parameter_layout = QGridLayout()
+        for i, e in enumerate(['Minimum', 'Maximum', 'Step']):
+            parameter_layout.addWidget(QLabel(e), 0, 1 + i)
+
         for row, parameter_type in enumerate(self.glitch_parameters):
             for i, e in enumerate(parameter_type):
-                parameter_layout.addWidget(e, row, i)
+                parameter_layout.addWidget(e, row + 1, i)
+                
         parent_layout.addLayout(parameter_layout)
         self.setLayout(parent_layout)

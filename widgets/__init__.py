@@ -18,9 +18,9 @@ from PyQt6.QtWidgets import (
     QGridLayout
 )
 
-class ParentWidget(QWidget):
+class XYPlaneWidget(QWidget):
     def __init__(self):
-        super(ParentWidget, self).__init__()
+        super(XYPlaneWidget, self).__init__()
 
         parent_layout = QGridLayout()
 
@@ -37,4 +37,17 @@ class ParentWidget(QWidget):
         parent_layout.addWidget(self.core_device_widget, 0, 1)
         parent_layout.addWidget(self.glitch_parameter_widget, 1, 1)
 
+        self.setLayout(parent_layout)
+
+class CrowbarWidget(QWidget):
+    def __init__(self):
+        super(CrowbarWidget, self).__init__()
+
+        parent_layout = QGridLayout()
+
+        # Parameter Control
+        self.glitch_parameter_widget = GlitchParametersWidget()
+        
+        parent_layout.addWidget(self.glitch_parameter_widget, 1, 1)
+        
         self.setLayout(parent_layout)

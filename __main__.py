@@ -1,6 +1,6 @@
 import sys
 from core_devices import CoreIODevices, PositionMode
-from PyQt6.QtGui import QAction, QIcon, QKeyEvent
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtCore import QEvent, QObject, Qt, QSize
 from PyQt6.QtWidgets import (
     QApplication,
@@ -12,9 +12,10 @@ from PyQt6.QtWidgets import (
     QToolBar,
     QWidget,
     QSizePolicy,
-    QGridLayout
+    QGridLayout,
+    QTabWidget
 )
-from widgets import ParentWidget
+from widgets import XYPlaneWidget, CrowbarWidget
 from handlers import *
 
 class MainWindow(QMainWindow):
@@ -26,31 +27,44 @@ class MainWindow(QMainWindow):
             Define components to be placed in the view.
         '''
 
+        self.tab_control = QTabWidget(self)
         # CoreIODevices.XY.connect('/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0')
         CoreIODevices.XY.connect('COM9')
+        CoreIODevices.XY.set_stepper_steps(X=200, Y=200, Z=800)
+        CoreIODevices.XY.set_message('OpenEMP loaded.')
 
         self.controller_worker = ControllerWorker()
         self.movement_worker = MovementWorker()
         # Toolbar
         toolbar = QToolBar("Main Toolbar")
         toolbar.setIconSize(QSize(16, 16))
+        toolbar.setMovable(False)
         self.addToolBar(toolbar)
 
         # Run Glitch
-        self.run_glitch_action = QAction(QIcon("bug.png"), "&Run Glitch", self)
+        self.run_glitch_action = QAction(QIcon("assets/play.png"), "&Run Glitch", self)
         self.run_glitch_action.setStatusTip('Start a glitch sequence with the specified parameters.')
         self.run_glitch_action.triggered.connect(self.onRunGlitchClicked)
         self.run_glitch_action.setCheckable(True)
 
         # Stop Glitch
-        self.stop_glitch_action = QAction(QIcon("bug.png"), "&Stop Glitch", self)
+        self.stop_glitch_action = QAction(QIcon("assets/stop.png"), "&Stop Glitch", self)
         self.stop_glitch_action.setStatusTip('Stop the current glitch sequence.')
         self.stop_glitch_action.triggered.connect(self.onRunGlitchClicked)
         self.stop_glitch_action.setCheckable(True)
 
+        self.spacer = QWidget()
+        self.spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+
         # Harness List
         self.harness_list = QComboBox()
         self.harness_list.setStatusTip('Selects the harness configuration to execute.')
+
+        self.harness_spacer = QWidget()
+        self.harness_spacer.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        self.harness_spacer.setFixedWidth(8)
+
+        self.tab_control = QTabWidget(self)
 
         '''
             Construct final layout.
@@ -65,15 +79,15 @@ class MainWindow(QMainWindow):
         toolbar.addSeparator()
         
         # Add harness list.
+        toolbar.addWidget(self.spacer)
         toolbar.addWidget(QLabel("Selected Harness"))
+        toolbar.addWidget(self.harness_spacer)
         toolbar.addWidget(self.harness_list)
-        toolbar.addSeparator()
-
-        CoreIODevices.XY.set_stepper_steps(X=200, Y=200, Z=800)
-        CoreIODevices.XY.set_message('OpenEMP loaded.')
 
         # Add subwindows.
-        self.setCentralWidget(ParentWidget())
+        self.tab_control.addTab(CrowbarWidget(), 'Crowbar')
+        self.tab_control.addTab(XYPlaneWidget(), 'XY')
+        self.setCentralWidget(self.tab_control)
         self.setStatusBar(QStatusBar(self))
         
         self.controller_worker.doAutoHome.connect(self.movement_worker.do_auto_home)
