@@ -45,6 +45,7 @@ class CoreDevicesWidget(QWidget):
 
         # Forward/Backward/Left/Right
         gantry_arrow_layout = QGridLayout()
+        gantry_arrow_layout.setRowStretch(0, 0)
         gantry_arrow_layout.addWidget(self.gantry_forward_button, 0, 1)
         gantry_arrow_layout.addWidget(self.gantry_backward_button, 2, 1)
         gantry_arrow_layout.addWidget(self.gantry_left_button, 1, 0)
@@ -57,10 +58,11 @@ class CoreDevicesWidget(QWidget):
         gantry_position_layout.addWidget(self.gantry_coordinate_spinners[1], 0, 1)
         gantry_position_layout.addWidget(self.gantry_coordinate_spinners[2], 0, 2)
 
-        gantry_layout.addWidget(QLabel('Probe Position'), 0, 0)
-        gantry_layout.addLayout(gantry_arrow_layout, 1, 0)
-        gantry_layout.addLayout(gantry_up_down_layout, 1, 1)
-        gantry_layout.addLayout(gantry_position_layout, 2, 0, 1, 2)
+        gantry_layout.addLayout(gantry_arrow_layout, 0, 0)
+        gantry_layout.addLayout(gantry_up_down_layout, 0, 1)
+        gantry_layout.addLayout(gantry_position_layout, 1, 0, 1, 2)
 
+        parent_layout.addWidget(QLabel('Probe Position'))
         parent_layout.addLayout(gantry_layout)
+
         self.setLayout(parent_layout)
