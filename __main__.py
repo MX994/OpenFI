@@ -30,14 +30,6 @@ class MainWindow(QMainWindow):
         self.tab_control = QTabWidget(self)
         self.crowbar_widget = CrowbarWidget()
         self.xy_widget = XYPlaneWidget()
-
-        # CoreIODevices.XY.connect('/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0')
-        CoreIODevices.XY.connect('COM9')
-        CoreIODevices.XY.set_stepper_steps(X=200, Y=200, Z=800)
-        CoreIODevices.XY.set_message('OpenEMP loaded.')
-
-        # self.controller_worker = ControllerWorker()
-        # self.movement_worker = MovementWorker()
         
         # Toolbar
         toolbar = QToolBar("Main Toolbar")

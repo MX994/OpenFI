@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
     QWidget,
     QSizePolicy,
     QVBoxLayout,
+    QHBoxLayout,
     QGridLayout,
     QPushButton,
     QDoubleSpinBox
@@ -54,7 +55,7 @@ class CrowbarGlitchParametersWidget(QWidget):
     def __init__(self):
         super(CrowbarGlitchParametersWidget, self).__init__()
 
-        parent_layout = QVBoxLayout()
+        parent_layout = QHBoxLayout()
 
         '''
             Define items to be used in the layout.

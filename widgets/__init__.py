@@ -32,6 +32,7 @@ class XYPlaneWidget(QWidget):
 
         # Logger Control
         self.logger_widget = LoggerWidget()
+
         
         parent_layout.addWidget(self.logger_widget, 1, 0)
         parent_layout.addWidget(self.core_device_widget, 0, 1)
