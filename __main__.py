@@ -28,13 +28,17 @@ class MainWindow(QMainWindow):
         '''
 
         self.tab_control = QTabWidget(self)
+        self.crowbar_widget = CrowbarWidget()
+        self.xy_widget = XYPlaneWidget()
+
         # CoreIODevices.XY.connect('/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0')
         CoreIODevices.XY.connect('COM9')
         CoreIODevices.XY.set_stepper_steps(X=200, Y=200, Z=800)
         CoreIODevices.XY.set_message('OpenEMP loaded.')
 
-        self.controller_worker = ControllerWorker()
-        self.movement_worker = MovementWorker()
+        # self.controller_worker = ControllerWorker()
+        # self.movement_worker = MovementWorker()
+        
         # Toolbar
         toolbar = QToolBar("Main Toolbar")
         toolbar.setIconSize(QSize(16, 16))
@@ -44,13 +48,13 @@ class MainWindow(QMainWindow):
         # Run Glitch
         self.run_glitch_action = QAction(QIcon("assets/play.png"), "&Run Glitch", self)
         self.run_glitch_action.setStatusTip('Start a glitch sequence with the specified parameters.')
-        self.run_glitch_action.triggered.connect(self.onRunGlitchClicked)
+        self.run_glitch_action.triggered.connect(self.onRunGlitch)
         self.run_glitch_action.setCheckable(True)
 
         # Stop Glitch
         self.stop_glitch_action = QAction(QIcon("assets/stop.png"), "&Stop Glitch", self)
         self.stop_glitch_action.setStatusTip('Stop the current glitch sequence.')
-        self.stop_glitch_action.triggered.connect(self.onRunGlitchClicked)
+        self.stop_glitch_action.triggered.connect(self.onStopGlitch)
         self.stop_glitch_action.setCheckable(True)
 
         self.spacer = QWidget()
@@ -85,19 +89,30 @@ class MainWindow(QMainWindow):
         toolbar.addWidget(self.harness_list)
 
         # Add subwindows.
-        self.tab_control.addTab(CrowbarWidget(), 'Crowbar')
-        self.tab_control.addTab(XYPlaneWidget(), 'XY')
+        self.tab_control.addTab(self.crowbar_widget, 'Crowbar')
+        self.tab_control.addTab(self.xy_widget, 'XY')
         self.setCentralWidget(self.tab_control)
         self.setStatusBar(QStatusBar(self))
         
-        self.controller_worker.doAutoHome.connect(self.movement_worker.do_auto_home)
-        self.controller_worker.doRelativeMove.connect(self.movement_worker.do_move_relative)
-        self.movement_worker.movementFinished.connect(self.controller_worker.enable_input)
-        self.controller_worker.start()
-    
-    def onRunGlitchClicked(self, s):
+        # Replace stdout.
+        self.queue = Queue()
+        sys.stdout = LoggerInterceptor(self.queue)
+        
+        # Start receiver thread.
+        self.logger_receiver_thread = QThread()
+        self.logger_receiver = LoggerReceiver(self.queue)
+        self.logger_receiver.textReceived.connect(self.crowbar_widget.logger_widget.add_line)
+        self.logger_receiver.textReceived.connect(self.xy_widget.logger_widget.add_line)
+        self.logger_receiver.moveToThread(self.logger_receiver_thread)
+        self.logger_receiver_thread.started.connect(self.logger_receiver.run)
+        self.logger_receiver_thread.start()
+        
+    def onRunGlitch(self, s):
         print("click", s)
 
+    def onStopGlitch(self, s):
+        print("click", s)
+        
 def main():
     app = QApplication(sys.argv)
     w = MainWindow()

@@ -20,7 +20,6 @@ class LoggerWidget(QWidget):
         '''
         self.line_edit = QTextEdit()
         self.line_edit.setReadOnly(True)
-        self.queue = Queue()
         
         '''
             Construct final layout.
@@ -29,17 +28,6 @@ class LoggerWidget(QWidget):
         parent_layout.addWidget(self.line_edit)
         parent_layout.addStretch()
         self.setLayout(parent_layout)
-
-        # Replace stdout.
-        sys.stdout = LoggerInterceptor(self.queue)
-        
-        # Start receiver thread.
-        self.logger_receiver_thread = QThread()
-        self.logger_receiver = LoggerReceiver(self.queue)
-        self.logger_receiver.textReceived.connect(self.add_line)
-        self.logger_receiver.moveToThread(self.logger_receiver_thread)
-        self.logger_receiver_thread.started.connect(self.logger_receiver.run)
-        self.logger_receiver_thread.start()
 
     def add_line(self, line):
         self.line_edit.moveCursor(QTextCursor.MoveOperation.End)

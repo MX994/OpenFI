@@ -28,7 +28,7 @@ class XYPlaneWidget(QWidget):
         self.core_device_widget = CoreDevicesWidget()
         
         # Parameter Control
-        self.glitch_parameter_widget = GlitchParametersWidget()
+        self.glitch_parameter_widget = XYGlitchParametersWidget()
 
         # Logger Control
         self.logger_widget = LoggerWidget()
@@ -45,9 +45,13 @@ class CrowbarWidget(QWidget):
 
         parent_layout = QGridLayout()
 
+        # Logger Control
+        self.logger_widget = LoggerWidget()
+
         # Parameter Control
-        self.glitch_parameter_widget = GlitchParametersWidget()
+        self.glitch_parameter_widget = CrowbarGlitchParametersWidget()
         
-        parent_layout.addWidget(self.glitch_parameter_widget, 1, 1)
+        parent_layout.addWidget(self.logger_widget, 0, 0)
+        parent_layout.addWidget(self.glitch_parameter_widget, 0, 1)
         
         self.setLayout(parent_layout)
