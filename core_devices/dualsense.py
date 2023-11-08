@@ -14,17 +14,17 @@ class Special(enum.Enum):
 
 class DualSense:
     def __init__(self) -> None:
-        self.dualsense = hid.device()
+        self.device = hid.device()
         self.frame = DualSenseFrame()
         self.deadzone = 20
         self.joy_center = 128
     
     def connect(self):
-        self.dualsense.open(0x054C, 0x0CE6)
-        self.dualsense.set_nonblocking(True)
+        self.device.open(0x054C, 0x0CE6)
+        self.device.set_nonblocking(True)
 
     def update(self):
-        if (data := self.dualsense.read(0x40)):
+        if (data := self.device.read(0x40)):
             self.frame = DualSenseFrame(data)
 
     def get_joy_lx(self):
