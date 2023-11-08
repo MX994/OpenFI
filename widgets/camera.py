@@ -1,16 +1,4 @@
-from PyQt6.QtWidgets import (
-    QApplication,
-    QCheckBox,
-    QComboBox,
-    QLabel,
-    QMainWindow,
-    QStatusBar,
-    QToolBar,
-    QWidget,
-    QSizePolicy,
-    QVBoxLayout,
-    QGridLayout
-)
+from PyQt6.QtWidgets import *
 
 class CameraWidget(QWidget):
     def __init__(self):

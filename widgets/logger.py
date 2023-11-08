@@ -24,7 +24,6 @@ class LoggerWidget(QWidget):
         '''
             Construct final layout.
         '''
-
         parent_layout.addWidget(self.line_edit)
         parent_layout.addStretch()
         self.setLayout(parent_layout)

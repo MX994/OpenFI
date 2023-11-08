@@ -1,5 +1,4 @@
 from PyQt6.QtCore import QThread, QObject, pyqtSlot, pyqtSignal
-from core_devices.dualsense import DualSense
 from core_devices import CoreIODevices, PositionMode
 
 class MovementWorker(QThread):

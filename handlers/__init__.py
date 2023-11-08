@@ -1,3 +1,3 @@
-from handlers.controller import *
-from handlers.movement import *
-from handlers.logger_write_stream import *
+from handlers.ControllerWorker import *
+from handlers.MovementWorker import *
+from handlers.LoggerInterceptor import *

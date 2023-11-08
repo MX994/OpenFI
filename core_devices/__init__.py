@@ -1,4 +1,4 @@
-from .xy_plane import *
+from .XYPlane import *
 
 class Devices:
     def __init__(self):
