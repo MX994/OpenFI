@@ -5,11 +5,16 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
 from widgets import XYPlane, Crowbar, CoreDevices
 from handlers import *
+import importlib
+from pathlib import Path
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setWindowTitle("OpenFI")
+
+        self.harness_path = Path('./harnesses')
+        self.current_harness = None
 
         '''
             Define components to be placed in the view.
@@ -22,9 +27,7 @@ class MainWindow(QMainWindow):
         # Toolbar
         toolbar = QToolBar("Main Toolbar")
         toolbar.setIconSize(QSize(16, 16))
-        toolbar.setMovable(False)
-        # self.addToolBar(toolbar)
-
+        
         # Run Glitch
         self.run_glitch_action = QAction(QIcon("assets/play.png"), "&Run Glitch", self)
         self.run_glitch_action.setStatusTip('Start a glitch sequence with the specified parameters.')
@@ -36,6 +39,18 @@ class MainWindow(QMainWindow):
         self.stop_glitch_action.setStatusTip('Stop the current glitch sequence.')
         self.stop_glitch_action.triggered.connect(self.onStopGlitch)
         self.stop_glitch_action.setCheckable(True)
+
+        # Refresh Harness List
+        self.refresh_harness_list = QAction(QIcon("assets/refresh.png"), "&Refresh Harness List", self)
+        self.refresh_harness_list.setStatusTip('Get all possible harnesses.')
+        self.refresh_harness_list.triggered.connect(self.onHarnessRefresh)
+        self.refresh_harness_list.setCheckable(True)
+
+        # Load Harness
+        self.load_harness = QAction(QIcon("assets/load.png"), "&Load Harness", self)
+        self.load_harness.setStatusTip('Load the selected harness.')
+        self.load_harness.triggered.connect(self.onHarnessLoad)
+        self.load_harness.setCheckable(True)
 
         # Harness List
         self.harness_list = QComboBox()
@@ -51,19 +66,26 @@ class MainWindow(QMainWindow):
             Construct final layout.
         '''
         layout = QHBoxLayout()
-        splitter = QSplitter(Qt.Orientation.Vertical)
         
-        # Add glitch controller buttons.
-        toolbar.addActions([
-            self.run_glitch_action,
-            self.stop_glitch_action
-        ])
+        # Build toolbar.
         toolbar.addSeparator()
         
         # Add harness list.
+        spacer = QWidget(self)
+        spacer.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        toolbar.addWidget(spacer)
+
+        # Glitch controller buttons.
+        toolbar.addActions([
+            self.run_glitch_action,
+            self.stop_glitch_action,
+            self.refresh_harness_list,
+            self.load_harness
+        ])
         toolbar.addWidget(QLabel("Selected Harness"))
         toolbar.addWidget(self.harness_spacer)
         toolbar.addWidget(self.harness_list)
+        self.addToolBar(toolbar)
 
         # Add subwindows.
         self.tab_control.addTab(self.crowbar_widget, 'Crowbar')
@@ -72,10 +94,6 @@ class MainWindow(QMainWindow):
         
         layout.addWidget(self.tab_control)
         self.setStatusBar(QStatusBar(self))
-        
-        # Replace stdout.
-        self.queue = Queue()
-        sys.stdout = LoggerHook(self.queue)
         
         # # Start receiver thread.
         # self.logger_receiver_thread = QThread()
@@ -94,6 +112,22 @@ class MainWindow(QMainWindow):
 
     def onStopGlitch(self, s):
         print("click", s)
+
+    def onHarnessLoad(self, s):
+        # Load harness.
+        if self.harness_list.currentText() not in [None, '']:
+            module_name = f'{self.harness_list.currentText()}.harness'
+            module_path = self.harness_path / self.harness_list.currentText() / 'harness.py'
+            if not module_path.exists():
+                return
+            spec = importlib.util.spec_from_file_location(module_name, module_path)
+            module = importlib.util.module_from_spec(spec)
+            sys.modules[module_name] = module
+            spec.loader.exec_module(module)
+            self.current_harness = module.Harness()
+    def onHarnessRefresh(self, s):
+        self.harness_list.clear()
+        self.harness_list.addItems([x.stem for x in self.harness_path.glob('*') if x.is_dir()])
         
 def main():
     app = QApplication(sys.argv)
