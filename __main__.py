@@ -32,33 +32,30 @@ class MainWindow(QMainWindow):
         self.run_glitch_action = QAction(QIcon("assets/play.png"), "&Run Glitch", self)
         self.run_glitch_action.setStatusTip('Start a glitch sequence with the specified parameters.')
         self.run_glitch_action.triggered.connect(self.onRunGlitch)
-        self.run_glitch_action.setCheckable(True)
 
         # Stop Glitch
         self.stop_glitch_action = QAction(QIcon("assets/stop.png"), "&Stop Glitch", self)
         self.stop_glitch_action.setStatusTip('Stop the current glitch sequence.')
         self.stop_glitch_action.triggered.connect(self.onStopGlitch)
-        self.stop_glitch_action.setCheckable(True)
 
         # Refresh Harness List
         self.refresh_harness_list = QAction(QIcon("assets/refresh.png"), "&Refresh Harness List", self)
         self.refresh_harness_list.setStatusTip('Get all possible harnesses.')
         self.refresh_harness_list.triggered.connect(self.onHarnessRefresh)
-        self.refresh_harness_list.setCheckable(True)
 
         # Load Harness
         self.load_harness = QAction(QIcon("assets/load.png"), "&Load Harness", self)
         self.load_harness.setStatusTip('Load the selected harness.')
         self.load_harness.triggered.connect(self.onHarnessLoad)
-        self.load_harness.setCheckable(True)
 
         # Harness List
         self.harness_list = QComboBox()
         self.harness_list.setStatusTip('Selects the harness configuration to execute.')
+        self.harness_list.setFixedWidth(128)
 
         self.harness_spacer = QWidget()
         self.harness_spacer.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
-        self.harness_spacer.setFixedWidth(8)
+        self.harness_spacer.setFixedWidth(16)
 
         self.tab_control = QTabWidget(self)
 

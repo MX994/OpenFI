@@ -30,12 +30,18 @@ class XYPlane:
                 response.append(current)
                 print(f'[-] {current}')
             print(f'[-] {current}')
+        return response
 
     def auto_home(self) -> bool:
         self.send_command('G28')
 
+    def beep(self):
+        self.send_command('M300')
+        
     def get_projected_position(self):
-        ...
+        response = self.send_command('M114R')
+        tokens = [x.split(':') for x in response[0].split(' ')]
+        return (tokens[0][1], tokens[1][1], tokens[2][1])
 
     def set_stepper_steps(self, X=None, Y=None, Z=None, E=None):
         self.send_command(f'M092 {f"X{X}" if X != None else ""} {f"Y{Y}" if Y != None else ""} {f"Z{Z}" if Z != None else ""}')

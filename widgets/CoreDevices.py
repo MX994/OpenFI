@@ -15,11 +15,13 @@ class CoreDevicesWidget(QWidget):
         # Getting UART devices
         self.gantry_uart_connections = QComboBox()
         self.gantry_uart_connect = QPushButton('Connect')
+        self.gantry_uart_connect.clicked.connect(self.connect_to_xy_plane)
         self.gantry_uart_refresh = QPushButton('Refresh Devices')
         self.gantry_uart_refresh.clicked.connect(self.get_uart_devices_gantry)
 
         self.emp_uart_connections = QComboBox()
         self.emp_uart_connect = QPushButton('Connect')
+        self.emp_uart_connect.clicked.connect(self.connect_to_emp)
         self.emp_uart_refresh = QPushButton('Refresh Devices')
         self.emp_uart_refresh.clicked.connect(self.get_uart_devices_emp)
 
@@ -58,9 +60,11 @@ class CoreDevicesWidget(QWidget):
 
     def connect_to_xy_plane(self):
         # CoreIODevices.XY.connect('/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0')
-        CoreIODevices.XY.connect('COM9')
+        print(self.gantry_uart_connections.currentText())
+        CoreIODevices.XY.connect(self.gantry_uart_connections.currentText())
         CoreIODevices.XY.set_stepper_steps(X=200, Y=200, Z=800)
         CoreIODevices.XY.set_message('OpenEMP loaded.')
+        CoreIODevices.XY.beep()
 
         # self.controller_worker = ControllerWorker()
         # self.movement_worker = MovementWorker()
