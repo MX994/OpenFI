@@ -36,7 +36,7 @@ class XYPlane:
         self.send_command('G28')
 
     def beep(self):
-        self.send_command('M300')
+        self.send_command('M300 P50')
         
     def get_projected_position(self):
         response = self.send_command('M114R')

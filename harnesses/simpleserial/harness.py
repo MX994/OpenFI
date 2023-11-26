@@ -1,7 +1,9 @@
 from api.Harness import *
+from time import sleep
 
 class Harness(DeviceHarness):
     def __init__(self):
+        self.count = 0
         return
     
     def configure(self) -> None:
@@ -12,7 +14,9 @@ class Harness(DeviceHarness):
         return
         
     def should_terminate(self) -> bool:
-        return True
+        return self.count == 10
     
     def test(self) -> bool:
-        return False
+        self.count += 1
+        sleep(0.25)
+        return True

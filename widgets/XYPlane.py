@@ -135,6 +135,20 @@ class XYPlaneWidget(QWidget):
         CoreIODevices.XY.auto_home()
         self.update_coordinate_spinners()
 
+    def set_minimum_coordinates_clicked(self):
+        position = CoreIODevices.XY.get_projected_position()
+        print(position)
+        self.glitch_parameters[2][1].setValue(float(position[0]))
+        self.glitch_parameters[3][1].setValue(float(position[1]))
+        self.glitch_parameters[4][1].setValue(float(position[2]))
+
+    def set_maximum_coordinates_clicked(self):
+        position = CoreIODevices.XY.get_projected_position()
+        print(position)
+        self.glitch_parameters[2][2].setValue(float(position[0]))
+        self.glitch_parameters[3][2].setValue(float(position[1]))
+        self.glitch_parameters[4][2].setValue(float(position[2]))
+
     def update_coordinate_spinners(self):
         if (coordinates := CoreIODevices.XY.get_projected_position()) != None:
             for coordinate_index, coordinate in enumerate(coordinates):

@@ -101,11 +101,29 @@ class MainWindow(QMainWindow):
         # self.logger_receiver_thread.started.connect(self.logger_receiver.run)
         # self.logger_receiver_thread.start()
 
+        self.glitch_worker = GlitchWorker()
+        self.controller_worker = ControllerWorker()
+        self.controller_worker.start()
+        self.controller_worker.setMinimumXYZ.connect(self.xy_widget.set_minimum_coordinates_clicked)
+        self.controller_worker.setMaximumXYZ.connect(self.xy_widget.set_maximum_coordinates_clicked)
+        
         self.setCentralWidget(QWidget())
         self.centralWidget().setLayout(layout)
          
     def onRunGlitch(self, s):
-        print("click", s)
+        parameters = self.xy_widget.glitch_parameters
+        configuration = {
+            'Mode': 'XY',
+        }
+        for parameter_type in parameters:
+            label = parameter_type[0].text()
+            for index, type in enumerate(['Min', 'Max', 'Step']):
+                configuration[f'{label} {type}'] = parameter_type[1 + index].value()
+        self.glitch_worker.set_harness(self.current_harness)
+        self.glitch_worker.set_configuration(configuration)
+        self.glitch_worker.start()
+        self.run_glitch_action.setDisabled(True)
+        self.stop_glitch_action.setEnabled(True)
 
     def onStopGlitch(self, s):
         print("click", s)
@@ -122,6 +140,7 @@ class MainWindow(QMainWindow):
             sys.modules[module_name] = module
             spec.loader.exec_module(module)
             self.current_harness = module.Harness()
+
     def onHarnessRefresh(self, s):
         self.harness_list.clear()
         self.harness_list.addItems([x.stem for x in self.harness_path.glob('*') if x.is_dir()])

@@ -1,11 +1,12 @@
 from PyQt6.QtCore import QThread, QObject, pyqtSlot, pyqtSignal
 from core_devices.DualSense import DualSense
 from core_devices import CoreIODevices, PositionMode
+from time import sleep
 
 class ControllerWorker(QThread):
-    doRelativeMove = pyqtSignal(tuple)
-    doAutoHome = pyqtSignal()
-    
+    setMinimumXYZ = pyqtSignal()
+    setMaximumXYZ = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.ds = DualSense()
@@ -19,13 +20,9 @@ class ControllerWorker(QThread):
     def run(self):
         while True:
             self.ds.update()
-            if not self.accepting_input:
-                continue
             if self.ds.get_r1_pressed():
-                self.accepting_input = False
-                self.doAutoHome.emit()
+                CoreIODevices.XY.auto_home()
                 continue
-
             scale = 5 if self.ds.get_l1_pressed() else 1
             pos = [
                 self.ds.get_joy_lx_radial() / 12.5, 
@@ -33,5 +30,14 @@ class ControllerWorker(QThread):
                 -self.ds.get_joy_ry_radial() / 50
             ]
             if any(map(lambda k: k != 0, pos)):
-                self.doRelativeMove.emit(tuple(map(lambda k: scale * k, pos)))
+                CoreIODevices.XY.set_position_mode(PositionMode.Relative)
+                CoreIODevices.XY.move(tuple(map(lambda k: scale * k, pos)))
                 self.accepting_input = False
+            
+            if self.ds.get_joy_l3_pressed():
+                self.setMinimumXYZ.emit()
+                sleep(0.250)
+
+            if self.ds.get_joy_r3_pressed():
+                self.setMaximumXYZ.emit()
+                sleep(0.250)

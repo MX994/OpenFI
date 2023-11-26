@@ -31,6 +31,18 @@ class GhettoGlitcher():
         self.socket.write(f'trigger_type {type}\n'.encode())
         self.print_response()
 
+    def reset_dut(self):
+        self.socket.write(f'reset_dut\n'.encode())
+        self.print_response()
+
+    def set_ext_offset(self, offs):
+        self.socket.write(f'ext_offset {offs}\n'.encode())
+        self.print_response()
+
+    def set_repeat(self, repeat):
+        self.socket.write(f'repeat {repeat}\n'.encode())
+        self.print_response()
+
     def print_response(self):
         while (line := self.socket.readline()) != '': 
             print(line)

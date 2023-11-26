@@ -20,8 +20,11 @@ class DualSense:
         self.joy_center = 128
     
     def connect(self):
-        self.device.open(0x054C, 0x0CE6)
-        self.device.set_nonblocking(True)
+        try:
+            self.device.open(0x054C, 0x0CE6)
+            self.device.set_nonblocking(True)
+        except:
+            pass
 
     def update(self):
         if (data := self.device.read(0x40)):
@@ -80,7 +83,7 @@ class DualSense:
         return self.frame.special & Special.L3.value
     
     def get_joy_r3_pressed(self):
-        return self.frame.special & Special.R3
+        return self.frame.special & Special.R3.value
 
 class DualSenseFrame:
     def __init__(self, buffer=None):
