@@ -1,0 +1,44 @@
+{
+    "job_number": "0",
+    "start_date": "2024-01-26",
+    "start_time": "13:37:44",
+    "job_type": "emfi",
+    "harness": "simpleserial",
+    "job_parameters": {
+        "x": {
+            "minimum": "",
+            "maximum": "",
+            "step": ""
+        },
+        "y": {
+            "minimum": "",
+            "maximum": "",
+            "step": ""
+        },
+        "z": {
+            "minimum": "",
+            "maximum": "",
+            "step": ""
+        },
+        "repeat": {
+            "minimum": "",
+            "maximum": "",
+            "step": ""
+        },
+        "tries": {
+            "minimum": "",
+            "maximum": "",
+            "step": ""
+        }
+    },
+    "results": [
+        {
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "repeat": 0,
+            "tries": 0,
+            "success": true
+        }
+    ]
+}
